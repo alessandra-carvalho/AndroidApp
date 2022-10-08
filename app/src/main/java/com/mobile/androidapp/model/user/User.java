@@ -1,19 +1,30 @@
-package com.mobile.androidapp.model;
+package com.mobile.androidapp.model.user;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 
 public class User implements Parcelable {
     private int id;
     private String name;
     private String userName;
+    private static String password = "123";
     private String email;
+    private Address address;
+    private String phone;
+    private String website;
+    private Company company;
 
-    public User(int id, String name, String userName, String email) {
+    public User(int id, String name, String userName, String email
+            , Address address, String phone, String website, Company company) {
         this.id = id;
         this.name = name;
         this.userName = userName;
         this.email = email;
+        this.address = address;
+        this.phone = phone;
+        this.website = website;
+        this.company = company;
     }
 
     protected User(Parcel in) {
@@ -21,7 +32,12 @@ public class User implements Parcelable {
         id = in.readInt();
         name = in.readString();
         userName = in.readString();
+        password = in.readString();
         email = in.readString();
+        //address = in.readString(company.getName());
+        phone = in.readString();
+        website = in.readString();
+        //company = in.readString();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -60,6 +76,14 @@ public class User implements Parcelable {
         this.userName = userName;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -79,6 +103,13 @@ public class User implements Parcelable {
         parcel.writeInt(id);
         parcel.writeString(name);
         parcel.writeString(userName);
+        parcel.writeString(password);
         parcel.writeString(email);
+        //parcel.writeString(address);
+        parcel.writeString(phone);
+        parcel.writeString(website);
+        parcel.writeString(company.getName());
+        parcel.writeString(company.getCatchPhrase());
+        parcel.writeString(company.getBs());
     }
 }
