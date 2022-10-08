@@ -113,6 +113,7 @@ public class UserRepository implements Listener<JSONArray>,Response.ErrorListene
     public User createUserFromJson(JSONObject json) {
         try {
 
+            // teste instancias das classes alvo
             AddressGeo objAddressGeo = new AddressGeo("lat xxx", "lng yyyy");
             Address objAddress = new Address("street xxxx", "suite xxxx", "city xxxx", objAddressGeo);
             Company objcompany = new Company("name company xxxx", "catchPhrase xxxx", "bs xxxxx");
@@ -120,7 +121,6 @@ public class UserRepository implements Listener<JSONArray>,Response.ErrorListene
             return new User(json.getInt("id"), json.getString("name"),
                     json.getString("username"), json.getString("email"), objAddress,
                     "phone xxxx", "website xxxx", objcompany);
-
 
             //return new User(json.getInt("id"), json.getString("name"),
              //   json.getString("username"), json.getString("username"));
@@ -173,14 +173,12 @@ public class UserRepository implements Listener<JSONArray>,Response.ErrorListene
                 System.out.println("Id: " +id);
                 System.out.println("Name: " +name);
 
-
                 // getting address
                 ObjectMapper mapper = new ObjectMapper();
                 Map<String, Object> userData = mapper.readValue(
                         String.valueOf(json), new TypeReference<Map<String, Object>>() {
                         });
                 Map address = ((Map)userData.get("address"));
-
 
                 // iterating address Map
                 Iterator<Map.Entry> itr1 = address.entrySet().iterator();
@@ -189,38 +187,17 @@ public class UserRepository implements Listener<JSONArray>,Response.ErrorListene
                     System.out.println(pair.getKey() + " : " + pair.getValue());
                 }
 
-
-
             } catch (JSONException | IOException e) {
                 e.printStackTrace();
             }
 
         }
-        Log.e(TAG, "onResponse: terminei" );
+        Log.e(TAG, "onResponse: END" );
     }
 
     @Override
     public void onErrorResponse(VolleyError error) {
         Log.e(TAG, "onErrorResponse: "+error.getMessage() );
     }
-    private void teste() {
-        Integer a = null;
-        int b = 0;
 
-        float c;
-        try {
-            c = a.floatValue() / b;
-        } catch (ArithmeticException e) {
-            e.getMessage();
-            e.printStackTrace();
-            c = 0;
-        } catch (NullPointerException npe) {
-            c = 0;
-        }
-
-        String str = null;
-        str.getBytes();
-
-
-    }
 }
