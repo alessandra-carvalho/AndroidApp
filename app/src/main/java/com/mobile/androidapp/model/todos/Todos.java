@@ -70,5 +70,15 @@ public class Todos implements Parcelable {
         parcel.writeString(title);
         //parcel.writeString(parcel.readString(completed)));
     }
+
+    //** Método para imprimir  */
+    public void exibirDadosTodos() {
+
+        System.out.println("ID Todos: " + this.id + "\n" +
+                "ID User: " + this.user.getId() + "\n" +
+                "Title: " + this.title + "\n" +
+                "Compleed: " + this.completed + "\n");
+    }
+
     
 }

@@ -71,4 +71,12 @@ public class Posts implements Parcelable {
         parcel.writeString(body);
     }
 
+    public void ImprimePostas(){
+
+        System.out.println("Id: " +id);
+
+
+
+    }
+
 }

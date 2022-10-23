@@ -8,7 +8,6 @@ public class User implements Parcelable {
     private int id;
     private String name;
     private String userName;
-    private static String password = "123";
     private String email;
     private Address address;
     private String phone;
@@ -32,7 +31,6 @@ public class User implements Parcelable {
         id = in.readInt();
         name = in.readString();
         userName = in.readString();
-        password = in.readString();
         email = in.readString();
         //address = in.readString(company.getName());
         phone = in.readString();
@@ -76,13 +74,6 @@ public class User implements Parcelable {
         this.userName = userName;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public String getEmail() {
         return email;
@@ -103,7 +94,6 @@ public class User implements Parcelable {
         parcel.writeInt(id);
         parcel.writeString(name);
         parcel.writeString(userName);
-        parcel.writeString(password);
         parcel.writeString(email);
         //parcel.writeString(address);
         parcel.writeString(phone);

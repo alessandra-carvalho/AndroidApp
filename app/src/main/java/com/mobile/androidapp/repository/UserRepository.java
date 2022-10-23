@@ -3,6 +3,8 @@ package com.mobile.androidapp.repository;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.viewpager.widget.ViewPager;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -19,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.nio.channels.InterruptedByTimeoutException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -44,58 +47,6 @@ public class UserRepository implements Listener<JSONArray>,Response.ErrorListene
         JsonArrayRequest jaRequest = new JsonArrayRequest(Request.Method.GET,
                                                        "https://jsonplaceholder.typicode.com/users",
                                                 null, this, this);
-
-        //exemplo de uso com injeção do ResponseListener e erro Listener
-        JsonArrayRequest jaRequestInject1 = new JsonArrayRequest(Request.Method.GET,
-                "https://jsonplaceholder.typicode.com/users",
-                null,
-                new Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        Log.e(TAG, "onResponse: " + response.length());
-                        for (int i = 0; i < response.length(); i++) {
-                            try {
-                                JSONObject json = response.getJSONObject(i);
-                                Log.d(TAG, "onResponse: " + json.toString());
-                                users.add(createUserFromJson(json));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        Log.e(TAG, "onResponse: terminei");
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e(TAG, "onErrorResponse: " + error.getMessage());
-                    }
-                });
-        //exemplo de uso com injeção com lambda do ResponseListener e erro Listener
-        JsonArrayRequest jaRequestInject2 = new JsonArrayRequest(Request.Method.GET,
-                "https://jsonplaceholder.typicode.com/users",
-                null,
-                (JSONArray response) -> {
-                        response = response;
-                        Log.e(TAG, "onResponse: " + response.length());
-                        for (int i = 0; i < response.length(); i++) {
-                            try {
-                                JSONObject json = response.getJSONObject(i);
-                                Log.d(TAG, "onResponse: " + json.toString());
-                                //isto
-                                users.add(createUserFromJson(json));
-                                //troca isto abaixo
-                                //users.add(new User(json.getInt("id"), json.getString("name"),
-                                //json.getString("username"), json.getString("username")));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        Log.e(TAG, "onResponse: terminei");
-                    }                ,
-                (VolleyError error) ->{
-                        Log.e(TAG, "onErrorResponse: " + error.getMessage());
-                    });
 
         queue.add(jaRequest);
 
@@ -135,22 +86,6 @@ public class UserRepository implements Listener<JSONArray>,Response.ErrorListene
         return users;
     }
 
-    public User getUserById(int id) {
-        User ret = null;
-        for(User u : users) {
-            if (u.getId() == id) {
-                ret = u;
-            }
-        }
-        return ret;
-    }
-
-    public User addUser(User user) {return null;}
-
-    public User updateUser(User user) {return null;}
-
-    public User removeUser(User user) {return null;}
-
     @Override
     public void onResponse(JSONArray response) {
 
@@ -159,33 +94,108 @@ public class UserRepository implements Listener<JSONArray>,Response.ErrorListene
             try {
                 JSONObject json = response.getJSONObject(i);
                 Log.d(TAG, "onResponse: "+json.toString());
-                //users.add( new User( json.getInt("id"), json.getString("name"),
-                //        json.getString("username"), json.getString("username")));
 
                 // https://www.geeksforgeeks.org/parse-json-java/
                 //https://www.digitalocean.com/community/tutorials/jackson-json-java-parser-api-example-tutorial
                 // typecasting obj to JSONObject
                 JSONObject jo = response.getJSONObject(i);
-                // getting firstName and lastName
-                String id = (String) jo.getString("id");
-                String name = (String) jo.getString("name");
 
+                // getting personal data
+                String id = (String) jo.getString("id");
+                int intId = Integer.parseInt(id);
+                String name = (String) jo.getString("name");
+                String userName = (String) jo.getString("username");
+                String email = (String) jo.getString("email");
+                String phone = (String) jo.getString("phone");
+                String website = (String) jo.getString("website");
+
+                String street = "";
+                String suite = "";
+                String city = "";
+
+                String companyName = "";
+                String companyCatchPhrase = "";
+                String companyBs = "";
+
+
+                // printing to test
                 System.out.println("Id: " +id);
                 System.out.println("Name: " +name);
+                System.out.println("Phone: " +phone);
+                System.out.println("Website: " +website);
 
                 // getting address
-                ObjectMapper mapper = new ObjectMapper();
-                Map<String, Object> userData = mapper.readValue(
+                ObjectMapper objMapperAddress = new ObjectMapper();
+                Map<String, Object> addressData = objMapperAddress.readValue(
                         String.valueOf(json), new TypeReference<Map<String, Object>>() {
                         });
-                Map address = ((Map)userData.get("address"));
+                Map address = ((Map)addressData.get("address"));
 
                 // iterating address Map
-                Iterator<Map.Entry> itr1 = address.entrySet().iterator();
-                while (itr1.hasNext()) {
-                    Map.Entry pair = itr1.next();
+                Iterator<Map.Entry> itrAddress = address.entrySet().iterator();
+                while (itrAddress.hasNext()) {
+                    Map.Entry pair = itrAddress.next();
+                    //System.out.println(pair.getKey() + " : " + pair.getValue());
+
+                    if (pair.getKey() == "street"){
+                        street = (String) pair.getValue();
+                    } else if (pair.getKey() == "suite") {
+                        suite = (String)  pair.getValue();
+                    } else if (pair.getKey() == "city") {
+                        city = (String)  pair.getValue();
+                    }
+
+                }
+
+                // create object AdressGeo (NAO ROLOU)
+                AddressGeo objAddressGeo = new AddressGeo("lat: NAO CONSEGUI ler a collectation interna de GEO ", "lng: NAO CONSEGUI ler a collectation interna de GEO");
+
+                // create object Adress (Success!)
+                Address objAddress = new Address(street, suite, city, objAddressGeo);
+
+                // getting geo
+                /*ObjectMapper objMapperGeo = new ObjectMapper();
+                Map<String, Object> geoData = objMapperGeo.readValue(
+                        String.valueOf(json), new TypeReference<Map<String, Object>>() {
+                        });
+                Map geo = ((Map)geoData.get("geo"));
+
+                // iterating address Map
+                Iterator<Map.Entry> itrGeo = geo.entrySet().iterator();
+                while (itrGeo.hasNext()) {
+                    Map.Entry pair = itrGeo.next();
                     System.out.println(pair.getKey() + " : " + pair.getValue());
                 }
+                */
+
+                // getting company
+                ObjectMapper objMapperCompany = new ObjectMapper();
+                Map<String, Object> companyData = objMapperCompany.readValue(
+                        String.valueOf(json), new TypeReference<Map<String, Object>>() {
+                        });
+                Map company = ((Map)companyData.get("company"));
+
+                // iterating company Map
+                Iterator<Map.Entry> itrCompany = company.entrySet().iterator();
+                while (itrCompany.hasNext()) {
+                    Map.Entry pair = itrCompany.next();
+                    //System.out.println(pair.getKey() + " : " + pair.getValue());
+
+                    if (pair.getKey() == "name"){
+                        companyName = (String) pair.getValue();
+                    } else if (pair.getKey() == "catchPhrase") {
+                        companyCatchPhrase = (String)  pair.getValue();
+                    } else if (pair.getKey() == "bs") {
+                        companyBs = (String)  pair.getValue();
+                    }
+                }
+
+                // create object Company (Success!)
+                Company objCompany = new Company(companyName, companyCatchPhrase, companyBs);
+
+                // create object User (Success!)
+                users.add(new User(intId, name, userName, email, objAddress, phone, website, objCompany));
+
 
             } catch (JSONException | IOException e) {
                 e.printStackTrace();
